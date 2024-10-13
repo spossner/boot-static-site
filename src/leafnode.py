@@ -6,10 +6,10 @@ class LeafNode(HTMLNode):
 
 
     def to_html(self):
-        if self.value is None:
+        if not self.value:
             raise ValueError("missing value")
         
-        if self.tag is None:
+        if not self.tag:
             return self.value
         
         return self.wrap_tag(self.value)

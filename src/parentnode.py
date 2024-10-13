@@ -5,10 +5,10 @@ class ParentNode(HTMLNode):
         super().__init__(tag, None, children, props)
 
     def to_html(self):
-        if self.tag is None:
+        if not self.tag:
             raise ValueError("missing tag")
         
-        if self.children is None:
+        if not self.children:
             raise ValueError("missing children")
         
         inner = []

@@ -40,6 +40,12 @@ class TestParentNode(unittest.TestCase):
             node.to_html()
         self.assertEqual(str(cm.exception), "missing children")
 
+    def test_empty_children(self):
+        node = ParentNode("p", [])
+        with self.assertRaises(ValueError) as cm:
+            node.to_html()
+        self.assertEqual(str(cm.exception), "missing children")
+
     def test_no_tag(self):
         node = ParentNode(None, None)
         with self.assertRaises(ValueError) as cm:
