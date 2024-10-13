@@ -8,24 +8,24 @@ class TestHTMLNode(unittest.TestCase):
         self.assertIsNone(empty.props_to_html())
 
     def test_span(self):
-        node = HTMLNode("span")
+        node = HTMLNode("foo bar")
         self.assertIsNone(node.props_to_html())
-        self.assertEqual(node.tag, "span")
-        self.assertIsNone(node.value)
+        self.assertEqual(node.value, "foo bar")
+        self.assertIsNone(node.tag)
         self.assertIsNone(node.children)
         self.assertIsNone(node.props)
 
     def test_simple(self):
-        node = HTMLNode(tag="p", value="foo bar", props={"class": "bg-red-700 px-3 py-1"})
-        self.assertEqual(node.tag, "p")
+        node = HTMLNode(value="foo bar", tag="p", props={"class": "bg-red-700 px-3 py-1"})
         self.assertEqual(node.value, "foo bar")
+        self.assertEqual(node.tag, "p")
         self.assertIsNone(node.children)
         self.assertEqual(node.props_to_html(), ' class="bg-red-700 px-3 py-1"')
         
 
     def test_multiprops(self):
-        node = HTMLNode(tag="a", value="Click me", props={"class": "bg-red-700 px-3 py-1", "href": "https://possner.dev", "target": "_blank"})
-        self.assertEqual(node.tag, "a")
+        node = HTMLNode(value="Click me", tag="a", props={"class": "bg-red-700 px-3 py-1", "href": "https://possner.dev", "target": "_blank"})
         self.assertEqual(node.value, "Click me")
+        self.assertEqual(node.tag, "a")
         self.assertIsNone(node.children)
         self.assertEqual(node.props_to_html(), ' class="bg-red-700 px-3 py-1" href="https://possner.dev" target="_blank"')
