@@ -1,8 +1,8 @@
 from htmlnode import *
 
 class LeafNode(HTMLNode):
-    def __init__(self, value, tag=None, props=None):
-        super().__init__(value, tag, None, props)
+    def __init__(self, tag, value, props=None):
+        super().__init__(tag, value, None, props)
 
 
     def to_html(self):
@@ -12,4 +12,4 @@ class LeafNode(HTMLNode):
         if self.tag is None:
             return self.value
         
-        return f"<{self.tag}{"" if self.props is None else self.props_to_html()}>{self.value}</{self.tag}>"
+        return self.wrap_tag(self.value)

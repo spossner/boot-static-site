@@ -1,7 +1,7 @@
 class HTMLNode:
-    def __init__(self, value = None, tag = None, children = None, props = None):
-        self.value = value
+    def __init__(self, tag = None, value = None, children = None, props = None):
         self.tag = tag
+        self.value = value
         self.children = children
         self.props = props
 
@@ -17,4 +17,7 @@ class HTMLNode:
         return result
     
     def __repr__(self):
-        return f"HTMLNode({self.value}, {self.tag}, [{self.children}], {self.props})"
+        return f"HTMLNode({self.tag}, {self.value}, {self.children}, {self.props})"
+
+    def wrap_tag(self, inner):
+        return f"<{self.tag}{"" if self.props is None else self.props_to_html()}>{inner}</{self.tag}>"
