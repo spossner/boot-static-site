@@ -127,3 +127,71 @@ class TestParser(unittest.TestCase):
                 "to youtube", TextType.LINK, "https://www.youtube.com/@bootdotdev"
             ),
         ])
+
+    def test_parse_example(self):
+        nodes = parse("This is **text** with an *italic* word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)")
+        self.assertListEqual(nodes, [
+            TextNode("This is ", TextType.TEXT),
+            TextNode("text", TextType.BOLD),
+            TextNode(" with an ", TextType.TEXT),
+            TextNode("italic", TextType.ITALIC),
+            TextNode(" word and a ", TextType.TEXT),
+            TextNode("code block", TextType.CODE),
+            TextNode(" and an ", TextType.TEXT),
+            TextNode("obi wan image", TextType.IMAGE, "https://i.imgur.com/fJRm4Vk.jpeg"),
+            TextNode(" and a ", TextType.TEXT),
+            TextNode("link", TextType.LINK, "https://boot.dev"),
+        ])
+
+    def test_blocks_simple(self):
+        blocks = markdown_to_blocks('''# This is a heading
+
+This is a paragraph of text. It has some **bold** and *italic* words inside of it.
+
+* This is the first list item in a list block
+* This is a list item
+* This is another list item''')
+        self.assertListEqual(blocks, [
+            "# This is a heading",
+            "This is a paragraph of text. It has some **bold** and *italic* words inside of it.",
+            '''* This is the first list item in a list block
+* This is a list item
+* This is another list item''',
+        ])
+
+    def test_blocks_heavy_newline(self):
+        blocks = markdown_to_blocks('''# This is a heading
+                                    
+
+
+    and more text with whatever      
+                                    
+                
+     and empty prefix
+                                    
+
+
+
+and empty suffix       
+                                    
+                                    ''')
+        self.assertListEqual(blocks, [
+            "# This is a heading",
+            "and more text with whatever",
+            "and empty prefix",
+            "and empty suffix",
+        ])
+
+    def test_blocks_at_ending(self):
+        blocks = markdown_to_blocks('''# This is a heading
+                                    
+- item 1
+- item 2                        
+
+and empty suffix''')
+        self.assertListEqual(blocks, [
+            "# This is a heading",
+            '''- item 1
+- item 2''',
+            "and empty suffix",
+        ])

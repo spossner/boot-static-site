@@ -1,6 +1,15 @@
 import re
 from textnode import *
 
+def parse(text):
+    root = TextNode(text, TextType.TEXT)
+    result = split_nodes_image([root])
+    result = split_nodes_link(result)
+    result = split_nodes_delimiter(result, '**', TextType.BOLD)
+    result = split_nodes_delimiter(result, '*', TextType.ITALIC)
+    result = split_nodes_delimiter(result, '`', TextType.CODE)
+    return result
+
 def split_nodes_delimiter(nodes, delimiter, text_type):
     result = []
     for node in nodes:
@@ -71,3 +80,23 @@ def extract_markdown_images(text):
 
 def extract_markdown_links(text):
     return _extract(text, r"(.*)\[([^\]]*)\]\(([^\)]*)\)(.*)")
+
+def markdown_to_blocks(text):
+    rows = text.split("\n")
+    result = []
+    block = []
+    in_block = False
+    for row in rows:
+        stripped = row.strip()
+        if not stripped: # empty row
+            if in_block:
+                result.append("\n".join(block))
+                block = []
+                in_block = False
+        else:
+            block.append(stripped)
+            in_block = True
+            
+    if block:
+        result.append("\n".join(block)) # add last block as well
+    return result
