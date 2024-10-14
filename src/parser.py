@@ -23,9 +23,51 @@ def split_nodes_delimiter(nodes, delimiter, text_type):
                 result.append(TextNode(parts[i], text_type))
     return result
 
+def _split_complex_types(nodes, extractor, text_type):
+    result = []
+    for node in nodes:
+        if node.text_type != TextType.TEXT:
+            result.append(node)
+            continue
+
+        images = extractor(node.text)
+        if not images:
+            result.append(node)
+            continue
+
+        for part in images:
+            if type(part) is tuple:
+                result.append(TextNode(part[0], text_type, part[1]))
+                continue
+            result.append(TextNode(part))
+
+
+    return result
+
+def split_nodes_image(nodes):
+    return _split_complex_types(nodes, extract_markdown_images, TextType.IMAGE)
+
+def split_nodes_link(nodes):
+    return _split_complex_types(nodes, extract_markdown_links, TextType.LINK)
+
+def _extract(text, regexp):
+    match = re.search(regexp, text)
+    if match is None:
+        return None
+
+    result = []
+    sub = _extract(match.group(1), regexp)
+    if sub:
+        result.extend(sub)
+    else:
+        result.append(match.group(1))
+    result.append(match.group(2,3))
+    if match.group(4):
+        result.append(match.group(4))
+    return result
 
 def extract_markdown_images(text):
-    return re.findall(r"!\[([^\]]*)\]\(([^\)]*)\)", text)
+    return _extract(text, r"(.*)!\[([^\]]*)\]\(([^\)]*)\)(.*)")
 
 def extract_markdown_links(text):
-    return re.findall(r"\[([^\]]*)\]\(([^\)]*)\)", text)
+    return _extract(text, r"(.*)\[([^\]]*)\]\(([^\)]*)\)(.*)")
