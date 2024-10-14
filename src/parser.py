@@ -1,5 +1,6 @@
 import re
 from textnode import *
+from block import *
 
 def parse(text):
     root = TextNode(text, TextType.TEXT)
@@ -96,7 +97,43 @@ def markdown_to_blocks(text):
         else:
             block.append(stripped)
             in_block = True
-            
+
     if block:
         result.append("\n".join(block)) # add last block as well
     return result
+
+def block_to_block_type(text):
+    if re.match(r"#{1,6} .*", text):
+        return BlockType.HEADING
+
+    if re.match(r"[`]{3}.*[`]{3}", text, re.DOTALL):
+        return BlockType.CODE
+    
+    # print("\n\n>>>",text,"<<<")
+    lines = text.split("\n")
+    quote = True
+    unordered_list = True
+    ordered_list = True
+
+    for i, line in enumerate(lines):
+        if quote and not re.match(r">.*", line):
+            quote = False
+        if unordered_list and not re.match(r"[*-] .*", line):
+            unordered_list = False
+        if ordered_list:
+            match = re.match(r"(\d+)\. .*", line)
+            if not match or match.group(1) != f"{i+1}":
+                ordered_list = False
+        if not quote and not unordered_list and not ordered_list:
+            break
+
+    if quote:
+        return BlockType.QUOTE
+    
+    if unordered_list:
+        return BlockType.UNORDERED_LIST
+    
+    if ordered_list:
+        return BlockType.ORDERED_LIST
+    
+    return BlockType.PARAGRAPH

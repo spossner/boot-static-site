@@ -195,3 +195,57 @@ and empty suffix''')
 - item 2''',
             "and empty suffix",
         ])
+
+    def test_block_type_heading(self):
+        self.assertEqual(block_to_block_type("# Heading 1"), BlockType.HEADING)
+        self.assertEqual(block_to_block_type("## Heading 2"), BlockType.HEADING)
+        self.assertEqual(block_to_block_type("### Heading 3"), BlockType.HEADING)
+        self.assertEqual(block_to_block_type("#### Heading 4"), BlockType.HEADING)
+        self.assertEqual(block_to_block_type("##### Heading 5"), BlockType.HEADING)
+        self.assertEqual(block_to_block_type("###### Heading 6"), BlockType.HEADING)
+        self.assertEqual(block_to_block_type("####### Heading 6"), BlockType.PARAGRAPH)
+
+    def test_block_type_code(self):
+        self.assertEqual(block_to_block_type("```print('Hello, world')```"), BlockType.CODE)
+        self.assertEqual(block_to_block_type("""```for i := range 10 {
+    fmt.Println(i)
+}```"""), BlockType.CODE)
+        self.assertEqual(block_to_block_type("```weird block..."), BlockType.PARAGRAPH)
+
+    def test_block_type_quote(self):
+        self.assertEqual(block_to_block_type("> quoting"), BlockType.QUOTE)
+        self.assertEqual(block_to_block_type("""> quote 1
+> quote 2
+> quote 3"""), BlockType.QUOTE)
+        self.assertEqual(block_to_block_type("""> quote 1
+no quote here
+> quote 3"""), BlockType.PARAGRAPH)
+        
+    def test_block_type_unordered_list(self):
+        self.assertEqual(block_to_block_type("* item 1"), BlockType.UNORDERED_LIST)
+        self.assertEqual(block_to_block_type("- item 1"), BlockType.UNORDERED_LIST)
+        self.assertEqual(block_to_block_type("""- item 1
+- item 2
+- item 3"""), BlockType.UNORDERED_LIST)
+        self.assertEqual(block_to_block_type("""* item 1
+* item 2
+* item 3"""), BlockType.UNORDERED_LIST)
+        self.assertEqual(block_to_block_type("""- item 1
+* item 2
+* item 3"""), BlockType.UNORDERED_LIST)
+        self.assertEqual(block_to_block_type("""- item 1
+no item here
+- item 3"""), BlockType.PARAGRAPH)
+        
+    def test_block_type_ordered_list(self):
+        self.assertEqual(block_to_block_type("1. item 1"), BlockType.ORDERED_LIST)
+        self.assertEqual(block_to_block_type("0. item 1"), BlockType.PARAGRAPH)
+        self.assertEqual(block_to_block_type("""1. item 1
+2. item 2
+3. item 3"""), BlockType.ORDERED_LIST)
+
+    def test_block_type_all_but_nothing(self):
+        self.assertEqual(block_to_block_type("""1. item 1
+1. no ite, here
+2. but again correct numbering
+3. last item"""), BlockType.PARAGRAPH)
