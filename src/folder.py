@@ -8,7 +8,7 @@ def clean(path):
         return
 
     for p in path.iterdir():
-        if p.is_file:
+        if p.is_file():
             p.unlink()
         elif p.is_dir():
             clean(p)
