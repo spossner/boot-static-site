@@ -1,4 +1,4 @@
-from htmlnode import *
+from html.htmlnode import HTMLNode
 
 class LeafNode(HTMLNode):
     def __init__(self, tag, value, props=None):
@@ -12,4 +12,4 @@ class LeafNode(HTMLNode):
         if not self.tag:
             return self.value
         
-        return self.wrap_tag(self.value)
+        return self.wrap(self.value)

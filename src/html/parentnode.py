@@ -1,4 +1,4 @@
-from htmlnode import *
+from html.htmlnode import HTMLNode
 
 class ParentNode(HTMLNode):
     def __init__(self, tag, children, props=None):
@@ -14,5 +14,5 @@ class ParentNode(HTMLNode):
         inner = []
         for child in self.children:
             inner.append(child.to_html())
-        return self.wrap_tag("".join(inner))
+        return self.wrap("".join(inner))
         

@@ -1,7 +1,7 @@
 import unittest
 
-from htmlnode import HTMLNode
-from textnode import TextNode
+from html.htmlnode import HTMLNode
+from parser.textnode import TextNode
 
 class TestHTMLNode(unittest.TestCase):
     def test_success(self):

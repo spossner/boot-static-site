@@ -1,6 +1,48 @@
 import re
-from textnode import *
-from block import *
+from parser.textnode import TextNode, TextType
+from html.parentnode import ParentNode
+from html.leafnode import LeafNode
+from md.block import BlockType
+
+def textnode2htmlnode(data):
+    if type(data) is list:
+        return map(lambda n: n.to_html_node(), data)
+    return data.to_html_node()
+
+def markdown_to_html_node(markdown):
+    blocks = markdown_to_blocks(markdown)
+    nodes = []
+    for block in blocks:
+        block_type = block_to_block_type(block)
+        match block_type:
+            case BlockType.PARAGRAPH:
+                children = list(textnode2htmlnode(parse(block)))
+                nodes.append(ParentNode(f"p", children))
+            case BlockType.HEADING:
+                sub_heading = block.split("\n")
+                for b in sub_heading:
+                    prefix, inner = b.split(" ", 1)
+                    children = textnode2htmlnode(parse(inner))
+                    nodes.append(ParentNode(f"h{len(prefix)}", children))
+            case BlockType.CODE:
+                nodes.append(LeafNode(f"code", block[3:-3]))
+            case BlockType.QUOTE:
+                rows = map(lambda row: row[1:].strip(), block.split("\n"))
+                children = list(map(lambda row: ParentNode("p", textnode2htmlnode(parse(row))), rows))
+                nodes.append(ParentNode("blockquote", children))
+            case BlockType.UNORDERED_LIST:
+                rows = map(lambda row: row.split(" ",1)[1].strip(), block.split("\n"))
+                children = list(map(lambda row: ParentNode("li", textnode2htmlnode(parse(row))), rows))
+                nodes.append(ParentNode("ul", children))
+            case BlockType.ORDERED_LIST:
+                rows = map(lambda row: row.split(" ",1)[1].strip(), block.split("\n"))
+                children = list(map(lambda row: ParentNode("li", textnode2htmlnode(parse(row))), rows))
+                nodes.append(ParentNode("ol", children))
+            case _:
+                print("huch", block_type)
+    return ParentNode("div", nodes)
+
+
 
 def parse(text):
     root = TextNode(text, TextType.TEXT)
@@ -87,16 +129,28 @@ def markdown_to_blocks(text):
     result = []
     block = []
     in_block = False
+    in_code = False
     for row in rows:
         stripped = row.strip()
         if not stripped: # empty row
-            if in_block:
+            if in_code:
+                block.append(row)
+            elif in_block:
                 result.append("\n".join(block))
                 block = []
                 in_block = False
         else:
-            block.append(stripped)
+            block.append(row if in_code else stripped)
             in_block = True
+            if in_code:
+                if stripped.endswith("```"):
+                    result.append("\n".join(block))
+                    block = []
+                    in_block = False
+                    in_code = False
+            else:
+                if stripped.startswith("```"):
+                    in_code = True
 
     if block:
         result.append("\n".join(block)) # add last block as well
@@ -106,10 +160,9 @@ def block_to_block_type(text):
     if re.match(r"#{1,6} .*", text):
         return BlockType.HEADING
 
-    if re.match(r"[`]{3}.*[`]{3}", text, re.DOTALL):
+    if re.match(r"```.*```", text, re.DOTALL):
         return BlockType.CODE
     
-    # print("\n\n>>>",text,"<<<")
     lines = text.split("\n")
     quote = True
     unordered_list = True

@@ -19,5 +19,5 @@ class HTMLNode:
     def __repr__(self):
         return f"HTMLNode({self.tag}, {self.value}, {self.children}, {self.props})"
 
-    def wrap_tag(self, inner):
+    def wrap(self, inner):
         return f"<{self.tag}{"" if self.props is None else self.props_to_html()}>{inner}</{self.tag}>"

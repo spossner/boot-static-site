@@ -1,7 +1,7 @@
 import unittest
 
-from textnode import *
-from parser import *
+from parser.textnode import TextNode, TextType
+from parser.parser import *
 
 class TestParser(unittest.TestCase):
     def test_code(self):
