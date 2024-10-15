@@ -5,7 +5,10 @@ from pathlib import Path
 ROOT_DIR = Path(__file__).parents[1]
 
 def main():
-    clean(ROOT_DIR.joinpath("public"))
+    public = ROOT_DIR.joinpath("public")
+    static = ROOT_DIR.joinpath("static")
+    clean(public)
+    copy(static, public)
 
 if __name__ == "__main__":
     main()
