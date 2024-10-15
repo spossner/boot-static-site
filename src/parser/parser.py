@@ -29,7 +29,7 @@ def markdown_to_html_node(markdown):
             case BlockType.QUOTE:
                 rows = map(lambda row: row[1:].strip(), block.split("\n"))
                 children = list(map(lambda row: ParentNode("p", textnode2htmlnode(parse(row))), rows))
-                nodes.append(ParentNode("blockquote", children))
+                nodes.append(ParentNode("blockquote", children, slim=True))
             case BlockType.UNORDERED_LIST:
                 rows = map(lambda row: row.split(" ",1)[1].strip(), block.split("\n"))
                 children = list(map(lambda row: ParentNode("li", textnode2htmlnode(parse(row))), rows))

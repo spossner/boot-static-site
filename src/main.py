@@ -13,7 +13,15 @@ def main():
     clean(public)
     copy(static, public)
 
-    generate_page(content/"index.md", template , public)
+    # generate_page(content/"index.md", template , public)
+    generate_pages_recursive(content, template, public)
+
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+    for p in dir_path_content.iterdir():
+        if p.is_file():
+            generate_page(p, template_path, dest_dir_path)
+        elif p.is_dir():
+            generate_pages_recursive(p, template_path, dest_dir_path / p.name)
 
 def generate_page(src, template, dest):
     print(f"Generating page from {src} to {dest}/{src.stem}.html using {template}")
