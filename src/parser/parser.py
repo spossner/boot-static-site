@@ -25,7 +25,7 @@ def markdown_to_html_node(markdown):
                     children = textnode2htmlnode(parse(inner))
                     nodes.append(ParentNode(f"h{len(prefix)}", children))
             case BlockType.CODE:
-                nodes.append(LeafNode(f"code", block[3:-3]))
+                nodes.append(ParentNode("pre", [LeafNode(f"code", block[3:-3])]))
             case BlockType.QUOTE:
                 rows = map(lambda row: row[1:].strip(), block.split("\n"))
                 children = list(map(lambda row: ParentNode("p", textnode2htmlnode(parse(row))), rows))
