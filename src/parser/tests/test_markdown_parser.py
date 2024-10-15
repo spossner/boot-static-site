@@ -6,6 +6,8 @@ from parser.parser import *
 __location__ = os.path.realpath(
     os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
+
+
 class TestMarkdownParser(unittest.TestCase):
     def test_simple_paragraphs(self):
         node = markdown_to_html_node('''This is a simple paragraph of text.
@@ -77,3 +79,23 @@ func main() {
   <h1>This is a larger code block</h1>
 </main>
 </code></pre></div>''')
+
+
+    def test_extract_title(self):
+        self.assertEqual(extract_title(
+"""
+This is a quick example
+
+     #        Title of the document     
+
+Witing this lorem ipsum...
+"""), "Title of the document")
+
+    def test_extract_no_title(self):
+        with self.assertRaises(Exception):
+            extract_title("""
+This is a quick example
+
+##        No title     
+
+Witing this lorem ipsum...""")

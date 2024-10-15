@@ -25,7 +25,7 @@ def markdown_to_html_node(markdown):
                     children = textnode2htmlnode(parse(inner))
                     nodes.append(ParentNode(f"h{len(prefix)}", children))
             case BlockType.CODE:
-                nodes.append(ParentNode("pre", [LeafNode(f"code", block[3:-3])]))
+                nodes.append(ParentNode("pre", [LeafNode(f"code", block[3:-3].strip())]))
             case BlockType.QUOTE:
                 rows = map(lambda row: row[1:].strip(), block.split("\n"))
                 children = list(map(lambda row: ParentNode("p", textnode2htmlnode(parse(row))), rows))
@@ -190,3 +190,9 @@ def block_to_block_type(text):
         return BlockType.ORDERED_LIST
     
     return BlockType.PARAGRAPH
+
+def extract_title(markdown):
+    match = re.search(r"^\s*#\s+(.*)", markdown, re.MULTILINE)
+    if not match:
+        raise Exception("no title found (# <title>)")
+    return match.group(1).strip()
